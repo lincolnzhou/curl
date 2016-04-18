@@ -201,7 +201,7 @@ class Curl
         $response = $rawResponse;
         if (isset($responseHeaders['Content-Type'])) {
             if ($responseHeaders['Content-Type'] == $this->contentTypeJson) {
-                $response = json_decode($response);
+                $response = json_decode($response, true);
             }
         }
 
@@ -272,6 +272,46 @@ class Curl
         $this->rawResponseHeaders .= $header;
 
         return strlen($header);
+    }
+
+    /**
+     * 发起Get请求
+     * @param string $url url地址
+     * @param array $data get请求数据
+     * @return null
+     */
+    public function get($url, $data = array())
+    {
+        if ('' == $url || is_null($url)) return null;
+
+        $this->setURL($url, $data);
+        $this->setOption(CURLOPT_CUSTOMREQUEST, 'GET');
+        $this->setOption(CURLOPT_HTTPGET, true);
+
+        return $this->exec();
+    }
+
+    public function post($url, $data = array())
+    {
+        if ('' == $url || is_null($url)) return null;
+
+        $this->setURL($url, $data);
+        $this->setOption(CURLOPT_POST, true);
+        $this->setOption(CURLOPT_POSTFIELDS, $this->buildPostData($data));
+
+        return $this->exec();
+    }
+
+    public function buildPostData($data)
+    {
+        if (empty($data)) return '';
+
+        $query = array();
+        foreach ($data as $key => $value) {
+            $query[] = $key . '=' . $value;
+        }
+
+        return implode('&', $query);
     }
 
     /**
