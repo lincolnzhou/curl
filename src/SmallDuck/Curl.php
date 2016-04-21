@@ -47,6 +47,8 @@ class Curl
 
     public $contentTypeJson = 'application/json;charset=UTF-8';
 
+    public $headers = array();
+
     /**
      * Curl constructor
      * @param null $url URL
@@ -93,6 +95,22 @@ class Curl
     {
         $this->options[$option] = $value;
         return curl_setopt($this->curl, $option, $value);
+    }
+
+    /**
+     * 设置请求头信息
+     * @param string $key key
+     * @param string $value value
+     */
+    public function setHeader($key, $value)
+    {
+        $this->headers[$key] = $value;
+        $headers = array();
+        foreach ($this->headers as $k => $v) {
+            $headers[] = $k . ":" .$v;
+        }
+
+        $this->setOption(CURLOPT_HEADER, $headers);
     }
 
     /**
@@ -291,11 +309,17 @@ class Curl
         return $this->exec();
     }
 
+    /**
+     * 发起Post请求
+     * @param string $url url地址
+     * @param array $data get请求数据
+     * @return null
+     */
     public function post($url, $data = array())
     {
         if ('' == $url || is_null($url)) return null;
 
-        $this->setURL($url, $data);
+        $this->setURL($url);
         $this->setOption(CURLOPT_POST, true);
         $this->setOption(CURLOPT_POSTFIELDS, $this->buildPostData($data));
 
@@ -308,7 +332,7 @@ class Curl
 
         $query = array();
         foreach ($data as $key => $value) {
-            $query[] = $key . '=' . $value;
+            $query[] = urlencode($key) . '=' . rawurlencode($value);
         }
 
         return implode('&', $query);
