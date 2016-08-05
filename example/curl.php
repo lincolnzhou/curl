@@ -9,8 +9,8 @@ $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
 $apiUrl = 'https://coding.net/api/';
 $loginUrl = $apiUrl . 'v2/account/login';
 $result = $curl->post($loginUrl, array(
-    'account' => '875199116@qq.com',
-    'password' => sha1('zsl728485'),
+    'account' => '',
+    'password' => sha1(''),
     'remember_me' => false,
 ));
 
